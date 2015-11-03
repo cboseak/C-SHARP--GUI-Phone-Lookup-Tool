@@ -98,27 +98,30 @@ namespace WindowsFormsApplication2
 
                             //uses our previously stored value to display the file directory in the openfile dialog text area
                             LoadFileTextBox.Text = openPath;
+
                         }
                     }
-                    this.label2.Text = "Ready - Rules Database is Loaded";
-                    this.progressBar1.Hide();
+
                 }
                 catch (Exception)
                 {
                     //generic exception handling, I may later add it so it handles each exception differently but this is good for now
                     MessageBox.Show("Error: Could not read file.");
 
-                    //if openfile is cancelled, check if the file was previously loaded and update status based on result
-                    if (openPath != null)
-                    {
-                        this.label2.Text = "Ready - Rules Database is Loaded";
-                    }
-                    else if (openPath == null)
-                    {
-                        this.label2.Text = "Ready - Please Load Rules Database";                        
-                    }
+
                 }
+
             }
+            //if openfile is cancelled, check if the file was previously loaded and update status based on result
+            if (openPath != null)
+            {
+                this.label2.Text = "Ready - Rules Database is Loaded";
+            }
+            else if (openPath == null)
+            {
+                this.label2.Text = "Ready - Please Load Rules Database";
+            }
+            this.progressBar1.Hide();
 
         }
 
