@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -69,14 +69,21 @@ namespace WindowsFormsApplication2
 
         private void button1_Click(object sender, EventArgs e)
         {
+            this.timer1.Start();
+            this.label2.Text = "Loading Rules Database - Please Wait";
+            this.progressBar1.Show();
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
+
                 try
                 {
                     if ((myStream = openFileDialog1.OpenFile()) != null)
                     {
+
                         using (myStream)
                         {
+
+
                             //stores the path of the opened file into a string so it can be used later
                             openPath = Path.GetDirectoryName(openFileDialog1.FileName) + "\\" + Path.GetFileName(openFileDialog1.FileName);
 
@@ -93,11 +100,23 @@ namespace WindowsFormsApplication2
                             LoadFileTextBox.Text = openPath;
                         }
                     }
+                    this.label2.Text = "Ready - Rules Database is Loaded";
+                    this.progressBar1.Hide();
                 }
                 catch (Exception)
                 {
                     //generic exception handling, I may later add it so it handles each exception differently but this is good for now
                     MessageBox.Show("Error: Could not read file.");
+
+                    //if openfile is cancelled, check if the file was previously loaded and update status based on result
+                    if (openPath != null)
+                    {
+                        this.label2.Text = "Ready - Rules Database is Loaded";
+                    }
+                    else if (openPath == null)
+                    {
+                        this.label2.Text = "Ready - Please Load Rules Database";                        
+                    }
                 }
             }
 
@@ -110,6 +129,7 @@ namespace WindowsFormsApplication2
             {
                 //clears box when new lookup is done
                 ProviderOutputBox.Clear();
+                emailOutTextbox.Clear();
 
                 //checks for all objects where the area code and exchange match our format
                 //read as "result = Provider object where area code contains area code in phone number
@@ -126,7 +146,28 @@ namespace WindowsFormsApplication2
                     ProviderOutputBox.AppendText("SMS/MMS Domain " + i.TextDomain + "\n");
                     ProviderOutputBox.AppendText("------------------------------------------" + "\n");
                 }
+
+                foreach (var i in result)
+                {
+                    //output emails to a textbox
+                    i.TextDomain = i.TextDomain.Replace("\"","");
+                    if (!checkBox1.Checked)
+                    {
+                        emailOutTextbox.AppendText(phoneNum.Substring(0, 3) + phoneNum.Substring(4, 3) +
+                                                   phoneNum.Substring(8, 4) + "@" + (i.TextDomain) + "\n");
+                    }
+                    else if (checkBox1.Checked && i.TextDomain != "PCS" && i.TextDomain != "WIRELESS" && i.TextDomain != "CLEC")
+                    {
+                        emailOutTextbox.AppendText(phoneNum.Substring(0, 3) + phoneNum.Substring(4, 3) +
+                                                   phoneNum.Substring(8, 4) + "@" + (i.TextDomain) + "\n");                        
+                    }
+                }
             }
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            this.progressBar1.Increment(10);
         }
     }
 
